@@ -1,0 +1,32 @@
+{
+  "name": "create-chart",
+  "version": "1.0.0",
+  "bin": {
+    "create-chart": "bin/create-chart",
+    "generate-vvc-release-data": "bin/generate-template-data"
+  },
+  "description": "Scaffolds out a VVC chart",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "node bin/generate-template-data.js"
+  },
+  "keywords": [],
+  "author": "Ændrew Rininsland <andrew.rininsland@ft.com>",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "execa": "^4.0.0",
+    "inquirer": "^7.0.4",
+    "libnpm": "^3.0.1",
+    "meow": "^5.0.0",
+    "ora": "^4.0.3"
+  },
+  "devDependencies": {
+    "@financial-times/vvc": "^0.1.24",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "prettier": "^1.19.1"
+  }
+}
