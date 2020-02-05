@@ -1,8 +1,8 @@
 # create-chart
 
-## Scaffolder for [Visual Vocabulary Components][1]
+## Scaffolder for [Visual Vocabulary Components][1]
 
-### Usage:
+### Usage:
 
 1. `npm init chart <chart-directory> [chart-name]`
 2. Get building!
