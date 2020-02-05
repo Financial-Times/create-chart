@@ -10,6 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "node bin/generate-template-data.js"
   },
+  "repository": {
+    "git": "https://github.com/Financial-Times/vvc-create-chart"
+  },
   "keywords": [],
   "author": "Ændrew Rininsland <andrew.rininsland@ft.com>",
   "license": "ISC",
