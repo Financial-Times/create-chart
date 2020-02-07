@@ -1,6 +1,6 @@
 {
   "name": "create-chart",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "bin": {
     "create-chart": "bin/create-chart",
     "generate-vvc-release-data": "bin/generate-template-data"
