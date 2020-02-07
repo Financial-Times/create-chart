@@ -14,8 +14,9 @@ const fs = require("fs").promises;
 const ora = require("ora");
 const { homedir } = require("os");
 const parcelIsInstalled = require("../lib/check-parcel-installation");
-const getEditors = require(join(__dirname, "..", "lib", "detect-editors"));
-const vvcData = require(join(__dirname, "..", "vvc-release-data.json"));
+const wrapValue = require("../lib/wrap-value");
+const getEditors = require("../lib/detect-editors");
+const vvcData = require("../vvc-release-data.json");
 
 const { input, flags, showHelp } = meow(`
       Usage
@@ -111,7 +112,7 @@ const { input, flags, showHelp } = meow(`
     // Get scaffolder's VVC version, insert that in scaffolded package.json
     const vvcVersion = vvcData.version;
     spinner.start(`Updating package.json to VVC version ${vvcVersion}`);
-    const srcPkg = require(join(src, "package.json"));
+    const srcPkg = require(join(src, "package.json")); // eslint-disable-line
     srcPkg.dependencies["@financial-times/vvc"] = vvcVersion;
     await fs.writeFile(
       join(dest, "package.json"),
@@ -150,7 +151,25 @@ import React from "react";
 import { templates } from "@financial-times/vvc";
 
 const App = () => (
-  <templates.${templateName} />
+  <templates.${templateName}
+${vvcData.templates[templateName].required
+  .map(
+    p =>
+      (vvcData.templates[templateName].defaults[p] &&
+        `    ${p}=${wrapValue(vvcData.templates[templateName].defaults[p])}`) ||
+      `    ${p}={/* required prop; please add a value */}`
+  )
+  .filter(i => i)
+  .join("\n")}
+${vvcData.templates[templateName].optional
+  .map(
+    p =>
+      vvcData.templates[templateName].defaults[p] &&
+      `    ${p}=${wrapValue(vvcData.templates[templateName].defaults[p])}`
+  )
+  .filter(i => i)
+  .join("\n")}
+  />
 );
 
 render(<App />, document.getElementById("root"));`;
@@ -167,7 +186,9 @@ render(<App />, document.getElementById("root"));`;
     // Get editor to use
     let scaffolderConfig;
     try {
-      scaffolderConfig = require(join(homedir(), ".vvcrc"));
+      scaffolderConfig = JSON.parse(
+        await fs.readFile(join(homedir(), ".vvcrc"), "utf-8")
+      );
     } catch (e) {
       const editorList = await getEditors();
       const { editor } = await inquirer.prompt({
@@ -178,7 +199,7 @@ render(<App />, document.getElementById("root"));`;
       });
 
       scaffolderConfig = {
-        editor: editorList.find(({ path }) => basename(path, ".app"))
+        editor: editorList.find(({ path }) => basename(path, ".app") === editor)
       };
 
       await fs.writeFile(
