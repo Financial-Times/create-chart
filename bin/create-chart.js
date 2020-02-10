@@ -16,6 +16,7 @@ const { homedir } = require("os");
 const parcelIsInstalled = require("../lib/check-parcel-installation");
 const wrapValue = require("../lib/wrap-value");
 const getEditors = require("../lib/detect-editors");
+const getTerminals = require("../lib/detect-terminal");
 const vvcData = require("../vvc-release-data.json");
 
 const { input, flags, showHelp } = meow(`
@@ -183,7 +184,7 @@ render(<App />, document.getElementById("root"));`;
       symbol: "🆒"
     });
 
-    // Get editor to use
+    // Get editor, terminal to use
     let scaffolderConfig;
     try {
       scaffolderConfig = JSON.parse(
@@ -191,6 +192,7 @@ render(<App />, document.getElementById("root"));`;
       );
     } catch (e) {
       const editorList = await getEditors();
+      // const terminalList = await getTerminals();
       const { editor } = await inquirer.prompt({
         message: "Which editor do you use?",
         type: "list",
@@ -198,8 +200,18 @@ render(<App />, document.getElementById("root"));`;
         name: "editor"
       });
 
+      // const { terminal } = await inquirer.prompt({
+      //   message: "Which terminal app do you use?",
+      //   type: "list",
+      //   choices: terminalList.map(({ path }) => basename(path, ".app")),
+      //   name: "terminal"
+      // });
+
       scaffolderConfig = {
         editor: editorList.find(({ path }) => basename(path, ".app") === editor)
+        // terminal: terminalList.find(
+        //   ({ path }) => basename(path, ".app") === terminal
+        // )
       };
 
       await fs.writeFile(
@@ -212,9 +224,28 @@ render(<App />, document.getElementById("root"));`;
     await execa("open", ["-b", scaffolderConfig.editor.bundle, dest], {
       shell: true
     });
+
     // Open folder in Finder
     await execa("open", [dest], { shell: true });
-    // @TODO open new terminal, run Parcel
+
+    // Open Parcel in Terminal in dest
+    await execa(
+      "osascript"[
+        ("-e", `'tell app "Terminal" to do script "parcel ${dest}"'`)
+      ],
+      {
+        shell: true
+      }
+    );
+
+    // @TODO make work with iTerm2
+    // if (scaffolderConfig.editor) {
+    //   // Open new terminal, run Parcelå
+    //   await execa("open", ["-b", scaffolderConfig.editor.bundle], {
+    //     shell: true
+    //   });
+    // }
+
     // Done!!! Get to work!
   } catch (e) {
     console.error(e);
